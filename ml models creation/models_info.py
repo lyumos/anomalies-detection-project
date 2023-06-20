@@ -1,13 +1,12 @@
 import pandas as pd
 from sklearn import svm
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
-from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
 # определение пути проекта
@@ -21,7 +20,6 @@ nb = GaussianNB()
 adaboost = AdaBoostClassifier(estimator=DecisionTreeClassifier(criterion='gini', max_depth=5))
 bagging = BaggingClassifier(estimator=DecisionTreeClassifier(criterion='gini', max_depth=5))
 gradboost = GradientBoostingClassifier()
-xgb = XGBClassifier()
 
 # определение параметров моделей
 models_info = (
@@ -35,9 +33,9 @@ models_info = (
     ),
     (
         rf,
-        {'n_estimators': [50, 100, 150, 200], 'criterion': ['gini', 'entropy'],
-         'min_samples_leaf': [0.1, 0.2, 0.3, 0.4, 0.5, 1], 'min_samples_split': [0.5, 1.0, 2, 3, 4],
-         'max_features': ['sqrt', 'log2']}
+        {'n_estimators': [100, 200], 'criterion': ['gini'],
+         'min_samples_leaf': [0.1, 0.2, 1], 'min_samples_split': [0.5, 1.0, 4],
+         'max_features': ['sqrt']}
     ),
     (
         nb,
@@ -45,23 +43,17 @@ models_info = (
     ),
     (
         adaboost,
-        {'n_estimators': [50, 100, 500, 1000], 'learning_rate': [0.1, 0.5, 1.0], 'algorithm': ['SAMME.R', 'SAMME']}
+        {'n_estimators': [50, 100], 'learning_rate': [0.1,  1.0], 'algorithm': ['SAMME.R', 'SAMME']}
     ),
     (
         bagging,
-        {'n_estimators': [50, 100, 500, 1000], 'random_state': [13, 42, 100], 'max_samples': [0.5, 0.75, 1.0]}
+        {'n_estimators': [50, 100], 'random_state': [13, 42, 100], 'max_samples': [0.5, 0.75, 1.0]}
     ),
     (
         gradboost,
-        {'n_estimators': [50, 100, 500, 1000], 'learning_rate': [0.1, 0.5, 1.0], 'max_depth': [3, 6, 9],
+        {'n_estimators': [50, 100], 'learning_rate': [0.1, 1.0], 'max_depth': [3, 6, 9],
          'random_state': [13, 42, 100]}
     ),
-    (
-        xgb,
-        {'max_depth': [3, 6, 9], 'eta': [0.1, 0.3, 0.5],
-         'objective': ['binary:logistic', 'multi:softmax', 'reg:squarederror'],
-         'eval_metric': ['rmse', 'mae', 'logloss', 'error']}
-    )
 )
 
 # определение датафрейма, содержащего результаты оценивания моделей

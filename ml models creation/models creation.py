@@ -1,5 +1,6 @@
 from models_info import path, models_info, df, characteristics
 import pandas as pd
+from tqdm import tqdm
 import os
 import pickle
 import numpy as np
@@ -15,11 +16,12 @@ def find_datasets(path):
         for file in files:
             if file.endswith('.csv') and file.find('dataset') != -1:
                 datasets_list.append(os.path.join(root, file))
+    print(f'Найдено {len(datasets_list)} датасета')
     return datasets_list
 
 
 def make_samples(dataset):
-    dataset = dataset[:10000]
+    dataset = dataset[:100]
     x = dataset.iloc[:, :-1]
     y = dataset.iloc[:, -1]
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=77, stratify=y)
@@ -65,13 +67,13 @@ def main_logic(path, models_info, df):
         filename = os.path.basename(dataset)
         dataset_df = pd.read_csv(dataset)
         x_train, x_test, y_train, y_test = make_samples(dataset_df)
-        for item in models_info:
+        chars = characteristics[filename[:2]]
+        for item in tqdm(models_info, desc=f'Создание моделей обучения для датасета характеристик {chars}'):
             count += 1
             model, name = create_model(x_train, y_train, item)
             evaluate_model(x_test, y_test, model, name, df, count)
-        chars = characteristics[filename[:2]]
         choose_model(df, chars)
-        load_model(model, filename[:2])
+        # load_model(model, filename[:2])
 
 
 if __name__ == '__main__':

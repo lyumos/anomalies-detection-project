@@ -2,6 +2,7 @@ from models_info import path, models_info, df, characteristics
 import pandas as pd
 from tqdm import tqdm
 import os
+import time
 import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -22,8 +23,7 @@ def find_datasets(path):
 
 #создание обучающей и тестовой выборок
 def make_samples(dataset):
-    dataset = dataset[:10000]
-    print(dataset.columns)
+    dataset = dataset[:100]
     x = dataset.iloc[:, :-1]
     y = dataset.iloc[:, -1]
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=77, stratify=y)
@@ -40,25 +40,32 @@ def create_model(x_train, y_train, model_info):
 
 #расчет метрик для оценивания работы модели обучения на тестовых данных
 def evaluate_model(x_test, y_test, model, name, df, count):
+    start_time = time.time()
     y_pred = model.predict(x_test)
+    end_time = time.time()
     results = {
         'model': name,
         'accuracy': round(accuracy_score(y_test, y_pred), 4),
         'precision': round(precision_score(y_test, y_pred), 4),
         'recall': round(recall_score(y_test, y_pred), 4),
-        'f1': round(f1_score(y_test, y_pred), 4)
+        'f1': round(f1_score(y_test, y_pred), 4),
+        'prediction time': round(end_time - start_time, 4)
     }
-    df.loc[count] = [results['model'], results['accuracy'], results['precision'], results['recall'], results['f1']]
+    df.loc[count] = [
+        results['model'], results['accuracy'], results['precision'],
+        results['recall'], results['f1'], results['prediction time']
+    ]
 
 
 #выбор наилучшего метода МО и соответсвующей модели обучения
 def choose_model(df, chars):
-    sorted_df = df.sort_values('f1', ascending=False)
+    sorted_df = df.sort_values(['f1', 'prediction time'], ascending=[False, True])
     print(f'Для датасета с характеристиками {chars} наилучшей себя показала модель '
           f'{str(sorted_df.iloc[0, 0].split("(")[0])} cо следующими значениями метрик: '
           f'\nAccuracy = {sorted_df.iloc[0, 1].tolist()}'
           f'\nPrecision= {sorted_df.iloc[0, 2].tolist()}\nRecall = {sorted_df.iloc[0, 3].tolist()}'
           f'\nF1 = {sorted_df.iloc[0, 4].tolist()}'
+          f'\nTime = {sorted_df.iloc[0, 5].tolist()}'
     )
     df.drop(df.index, axis=0, inplace=True)
 

@@ -7,7 +7,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
-from xgboost import XGBClassifier
 
 # определение пути проекта
 path = '../../anomalies-detection-project'
@@ -48,7 +47,7 @@ models_info = (
 )
 
 # определение датафрейма, содержащего результаты оценивания моделей
-df = pd.DataFrame(columns=['model', 'accuracy', 'precision', 'recall', 'f1'])
+df = pd.DataFrame(columns=['model', 'accuracy', 'precision', 'recall', 'f1', 'prediction time'])
 
 #определение характеристик
 characteristics = {'nc': 'сети', 'dc': 'домена'}
